@@ -25,5 +25,5 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          python main.py {GH_TOKEN}
+          python main.py ${{ secrets.GH_TOKEN }}
         shell: bash -l {0}
