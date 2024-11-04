@@ -3,12 +3,22 @@ import requests
 
 
 def get_github_data(url, headers):
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    return response.json()
+    results = []
+    while url:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        results.extend(response.json())
 
+        # GitHub paginates responses with 'Link' headers. Find the 'next' page URL if it exists.
+        if 'next' in response.links:
+            url = response.links['next']['url']
+        else:
+            url = None
+    return results
 
-headers = {"Authorization": f"token {sys.argv[1]}"}
+token = "***REMOVED***"
+
+headers = {"Authorization": f"token {token}"}
 
 # Get list of users you follow
 following_url = "https://api.github.com/user/following"
@@ -18,8 +28,10 @@ following = [user['login'] for user in get_github_data(following_url, headers)]
 followers_url = "https://api.github.com/user/followers"
 followers = [user['login'] for user in get_github_data(followers_url, headers)]
 
-# Find users you follow who don't follow you back
-non_followers = set(following) - set(followers)
+non_followers = []
+for i_follow in following:
+    if i_follow not in followers:
+        non_followers.append(i_follow)
 
 for user in non_followers:
     unfollow_url = f"https://api.github.com/user/following/{user}"
