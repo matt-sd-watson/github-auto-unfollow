@@ -1,7 +1,6 @@
 import sys
 import requests
 
-
 def get_github_data(url, headers):
     results = []
     while url:
@@ -16,7 +15,10 @@ def get_github_data(url, headers):
             url = None
     return results
 
-token = "***REMOVED***"
+try:
+    token = sys.argv[1] if sys.argv else None
+except (KeyError, IndexError):
+    token = None
 
 headers = {"Authorization": f"token {token}"}
 
